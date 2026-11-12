@@ -56,7 +56,7 @@
             "transport_udp",
         ] }
         #zenoh-config = "1.7.2"
-        tower-http = "0.6.11"
+        tower-http = "0.7.1"
         time = { version = "0.3.45", default-features = false, features = [
             "serde",
             # "formatting",
