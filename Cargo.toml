@@ -80,7 +80,7 @@
         paste = { version = "1.0", default-features = false }
         rand = "0.10.1"
         tempfile = "3"
-        sysinfo = { version = "0.38.4", features = [ "system" ] }
+        sysinfo = { version = "0.40.1", features = [ "system" ] }
         erased-serde = "0.4"
         rust-embed = { version = "8", features = [
             "mime-guess",
