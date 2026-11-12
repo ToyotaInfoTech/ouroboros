@@ -42,7 +42,7 @@
             "ansi",
         ] }
         flatbuffers = "25.9.23"
-        sqlx = { version = "0.8.6", default-features = false, features = [
+        sqlx = { version = "0.9.0", default-features = false, features = [
             "sqlite",
             "runtime-tokio",
             "postgres",
