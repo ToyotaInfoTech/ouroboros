@@ -33,7 +33,7 @@
         "numpy>=2.0",
         "opencv-python-headless>=4.10.0",
         "pyyaml>=6.0",
-        "ray[default]>=2.52.0",
+        "ray[default]>=2.60.0",
         "sortedcontainers>=2.4",
         "pyproj>=3.0",
         "sumolib>=1.25.0",
