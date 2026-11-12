@@ -1,0 +1,326 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+[metadata]
+    schema_version = 1
+    [[metadata.epoch]]
+        display_name = "base"
+        epoch = 1
+
+[runtime]
+    daemon_id = "center-daemon"
+    version = "0.1"
+
+[metrics_store]
+    type = "in_memory"
+    max_points_per_metric = 1000
+
+[cli_endpoint]
+    type = "unix_domain_socket"
+    path = "/tmp/ourodaemon.sock"
+
+[[data_source]]
+    type = "sql_db"
+    name = "postgres"
+    [data_source.config]
+        type = "postgres"
+        # Required: no default, because the URL embeds the database password.
+        database_url = "${DATABASE_URL}"
+        max_connections = 50
+        init_sql = [
+
+            """
+        CREATE EXTENSION IF NOT EXISTS timescaledb;
+        """,
+
+            """
+        CREATE TABLE IF NOT EXISTS telemetry (
+            vin TEXT NOT NULL,
+            start_time TIMESTAMPTZ NOT NULL,
+            end_time TIMESTAMPTZ NOT NULL,
+            model TEXT NOT NULL,
+            metadata JSONB,
+            PRIMARY KEY (vin, start_time)
+        );
+        """,
+
+            """
+        DELETE FROM telemetry;
+        """,
+
+            """
+        SELECT create_hypertable('telemetry','start_time', if_not_exists => TRUE);
+        """,
+
+            """
+        CREATE INDEX IF NOT EXISTS telemetry_start_time_desc ON telemetry (start_time DESC);
+        """,
+
+            """
+        CREATE TABLE IF NOT EXISTS system_state (
+            vin TEXT NOT NULL,
+            last_update TIMESTAMPTZ NOT NULL,
+            PRIMARY KEY (vin)
+        );
+        """,
+
+            """
+        DELETE FROM system_state;
+        """,
+
+            """
+        CREATE TABLE IF NOT EXISTS device_shadows (
+            edge_id TEXT PRIMARY KEY,
+            desired_state JSONB,
+            state_report JSONB,
+            last_seen TIMESTAMPTZ NOT NULL
+        );
+        """,
+
+            """
+        DELETE FROM device_shadows;
+        """,
+
+            """
+        CREATE TABLE IF NOT EXISTS state_tags (
+            tag_id       TEXT PRIMARY KEY,
+            epoch        INT8 NOT NULL DEFAULT 1,
+            display_name TEXT NOT NULL UNIQUE,
+            priority     INT NOT NULL,
+            patch        JSONB NOT NULL,
+            created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        """,
+
+            """
+        CREATE OR REPLACE FUNCTION state_tags_auto_update()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.epoch := OLD.epoch + 1;
+            NEW.updated_at = NOW();
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        """,
+
+            """
+        DELETE FROM state_tags;
+        """,
+
+            """
+        CREATE OR REPLACE TRIGGER trg_state_tags_epoch
+        BEFORE UPDATE ON state_tags
+        FOR EACH ROW
+        EXECUTE FUNCTION state_tags_auto_update();
+        """,
+
+            """
+        CREATE TABLE IF NOT EXISTS edge_tag_assignments (
+            edge_id TEXT NOT NULL REFERENCES device_shadows(edge_id) ON DELETE CASCADE,
+            tag_id TEXT NOT NULL REFERENCES state_tags(tag_id) ON DELETE CASCADE,
+            PRIMARY KEY (edge_id, tag_id)
+        );
+        """,
+
+            """
+        CREATE TABLE IF NOT EXISTS camera_image (
+            id BIGSERIAL PRIMARY KEY,
+            vin TEXT NOT NULL,
+            start_time TIMESTAMPTZ NOT NULL,
+            camera_id TEXT NOT NULL,
+            ts TIMESTAMPTZ NOT NULL,
+            image BYTEA NOT NULL,
+            FOREIGN KEY (vin, start_time) REFERENCES telemetry(vin, start_time) ON DELETE CASCADE
+        );
+        """,
+
+            """
+        CREATE INDEX IF NOT EXISTS camera_image_vin_start_time ON camera_image (vin, start_time);
+        """,
+
+            """
+        CREATE INDEX IF NOT EXISTS telemetry_vin ON telemetry (vin);
+        """,
+
+            """
+        CREATE INDEX IF NOT EXISTS camera_image_lookup ON camera_image (vin, start_time, camera_id, ts);
+        """,
+
+            """
+        ALTER TABLE telemetry SET (
+            timescaledb.compress,
+            timescaledb.compress_segmentby = 'vin',
+            timescaledb.compress_orderby = 'start_time DESC'
+        );
+        """,
+
+            """
+        SELECT add_compression_policy('telemetry', INTERVAL '7 days', if_not_exists => TRUE);
+        """,
+        ]
+    [data_source.retry]
+        max_attempts = 3
+        initial_backoff_ms = 1000
+        backoff_multiplier = 2.0
+
+[[repository]]
+    type = "shadow_store"
+    name = "transient_shadow_store"
+    [repository.shadow_store]
+        type = "transient"
+
+[[repository]]
+    type = "tag_store"
+    name = "persistent_tag_store"
+    [repository.tag_store]
+        [repository.tag_store.with_data_source]
+            [repository.tag_store.with_data_source.ref]
+                type = "sql_db"
+                ref = "postgres"
+
+[[repository]]
+    name = "persistent_shadow_store"
+    type = "shadow_store"
+    [repository.shadow_store]
+        type = "persistent"
+        [repository.shadow_store.with_data_source]
+            [repository.shadow_store.with_data_source.ref]
+                type = "sql_db"
+                ref = "postgres"
+
+[[repository]]
+    name = "write_behind_shadow_store"
+    type = "shadow_store"
+    [repository.shadow_store]
+        type = "write_behind"
+        [repository.shadow_store.with_data_source]
+            [repository.shadow_store.with_data_source.ref]
+                type = "sql_db"
+                ref = "postgres"
+
+[[client]]
+    name = "zenoh-session"
+    [client.endpoint]
+        type = "zenoh"
+        endpoints = [ "tcp/ourocloud:7448" ]
+    [client.retry]
+        max_attempts = 3
+        initial_backoff_ms = 1000
+        backoff_multiplier = 2.0
+
+[[task]]
+    name = "heartbeat"
+    type = "data_ingestion"
+    enabled = true
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.with_data_source]
+        [task.with_data_source.ref]
+            type = "sql_db"
+            ref = "postgres"
+    [task.data]
+        type = "heartbeat"
+        [task.data.with_repository]
+            type = "ref"
+            ref = "persistent_shadow_store"
+    [task.behavior]
+        max_continuous_errors = 3
+    [task.attribute]
+        offline_timeout_secs = 30
+
+[[task]]
+    name = "state"
+    type = "repository_ingestion"
+    enabled = true
+    heartbeat_timeout_secs = 60
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.with_repository]
+        type = "ref"
+        ref = "persistent_shadow_store"
+    [task.with_tag_repository]
+        type = "ref"
+        ref = "persistent_tag_store"
+    [task.repository_data]
+        type = "state"
+    [task.behavior]
+        max_continuous_errors = 3
+
+[[task]]
+    name = "tag"
+    type = "tag_management"
+    enabled = true
+    default_edge_state_path = "./etc/edge_config_full_ray.toml"
+    [[task.predefined_tag]]
+        display_name = "base"
+        priority = 0
+        path = "./etc/edge_config_base_ray.toml"
+    [[task.predefined_tag]]
+        display_name = "metadata"
+        priority = 1
+        path = "./etc/edge_config_metadata.toml"
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.with_tag_repository]
+        type = "ref"
+        ref = "persistent_tag_store"
+    [task.with_shadow_repository]
+        type = "ref"
+        ref = "persistent_shadow_store"
+    [task.behavior]
+        max_continuous_errors = 3
+
+[[task]]
+    name = "trajectory"
+    type = "data_ingestion"
+    enabled = true
+    [task.with_data_source]
+        [task.with_data_source.ref]
+            type = "sql_db"
+            ref = "postgres"
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.behavior]
+        max_continuous_errors = 3
+    [task.data]
+        type = "trajectory"
+    [task.attribute]
+        max_concurrent_tasks = 20
+
+[[task]]
+    name = "metrics"
+    type = "metrics"
+    enabled = true
+    [task.store]
+        type = "in_memory"
+        max_points_per_metric = 1000
+    [task.with_server]
+        type = "def"
+        [task.with_server.def]
+            name = "metrics-json-http-server"
+            [[task.with_server.def.endpoint]]
+                type = "http"
+                bind_addrs = [ "${OURO_METRICS_BIND:-127.0.0.1:8080}" ]
+
+[[task]]
+    name = "webui"
+    type = "web_ui"
+    enabled = true
+    # Empty disables authentication; set OURO_WEBUI_TOKEN before exposing the WebUI beyond localhost.
+    auth_token = "${OURO_WEBUI_TOKEN:-}"
+    [task.with_data_source]
+        [task.with_data_source.ref]
+            type = "sql_db"
+            ref = "postgres"
+    [task.with_server]
+        type = "def"
+        [task.with_server.def]
+            name = "webui-http-server"
+            [[task.with_server.def.endpoint]]
+                type = "http"
+                bind_addrs = [ "${OURO_WEBUI_BIND:-127.0.0.1:3001}" ]

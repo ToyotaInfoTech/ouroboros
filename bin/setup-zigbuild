@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+brew install zig@0.14
+cargo install cargo-zigbuild

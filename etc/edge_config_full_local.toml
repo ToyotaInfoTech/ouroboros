@@ -1,0 +1,152 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+[metadata]
+    schema_version = 1
+    [[metadata.epoch]]
+        display_name = "base"
+
+[runtime]
+    edge_id = "auto"
+    model = "auto"
+    version = "0.1"
+    [runtime.with_data_source]
+        [runtime.with_data_source.ref]
+            type = "sql_db"
+            ref = "sqlite_memory"
+
+[[data_source]]
+    type = "sql_db"
+    name = "sqlite_memory"
+    [data_source.config]
+        type = "sqlite"
+        init_sql = [ """
+            CREATE TABLE IF NOT EXISTS system_state (
+                ts TIMESTAMP NOT NULL,
+                state JSONB NOT NULL,
+                PRIMARY KEY (ts)
+            );""", """
+            CREATE TABLE IF NOT EXISTS system_state_camera (
+                ts TIMESTAMP NOT NULL,
+                camera_id TEXT NOT NULL,
+                image BLOB NOT NULL,
+                PRIMARY KEY (ts, camera_id),
+                FOREIGN KEY (ts) REFERENCES system_state(ts) ON DELETE CASCADE
+            );""" ]
+        database_url = "sqlite::memory:"
+    [data_source.retry]
+        max_attempts = 3
+        initial_backoff_ms = 1000
+        backoff_multiplier = 2.0
+
+[[client]]
+    name = "zenoh-session"
+    [client.endpoint]
+        type = "zenoh"
+        endpoints = [ "tcp/localhost:7447" ]
+    [client.retry]
+        max_attempts = 3
+        initial_backoff_ms = 1000
+        backoff_multiplier = 2.0
+
+[[task]]
+    name = "heartbeat"
+    type = "data_upload"
+    enabled = true
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.data]
+        type = "heartbeat"
+    [task.behavior]
+        max_continuous_errors = 3
+        [[task.behavior.trigger]]
+            type = "periodic"
+            enabled = true
+            interval_secs = 5
+
+[[task]]
+    type = "command_watch"
+    name = "command_watch"
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+
+[[task]]
+    type = "tag_watch"
+    name = "tag_watch"
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+
+[[task]]
+    type = "data_upload"
+    name = "state_report"
+    enabled = true
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.data]
+        type = "state"
+    [task.behavior]
+        max_continuous_errors = 3
+        [[task.behavior.trigger]]
+            type = "periodic"
+            enabled = true
+            interval_secs = 5
+        [[task.behavior.trigger]]
+            type = "instant"
+            enabled = true
+[[data_source]]
+    type = "sql_db"
+    name = "sqlite_camera"
+    [data_source.config]
+        type = "sqlite_temp_file"
+        init_sql = [
+            """
+            CREATE TABLE IF NOT EXISTS camera_image (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                metadata_id INTEGER NOT NULL,
+                -- Logical reference to metadata(id). Cross-DB FK is not enforceable
+                -- in SQLite; consistency is maintained at the application layer.
+                camera_id   TEXT NOT NULL,
+                ts          TIMESTAMP NOT NULL,
+                image       BLOB NOT NULL
+            );""",
+        ]
+    [data_source.retry]
+        max_attempts = 3
+        initial_backoff_ms = 1000
+        backoff_multiplier = 2.0
+
+[[task]]
+    name = "periodic_metadata_upload"
+    type = "data_upload"
+    enabled = true
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.data]
+        type = "trajectory"
+        [task.data.with_data_source]
+            [task.data.with_data_source.ref]
+                type = "sql_db"
+                ref = "sqlite_memory"
+                init_sql = [ """
+                    CREATE TABLE IF NOT EXISTS metadata (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        start_time TIMESTAMP NOT NULL,
+                        end_time TIMESTAMP NOT NULL,
+                        cbor BLOB NOT NULL,
+                        acked BOOLEAN NOT NULL DEFAULT 0
+                    );""" ]
+        [task.data.with_camera_data_source]
+            [task.data.with_camera_data_source.ref]
+                type = "sql_db"
+                ref = "sqlite_camera"
+    [task.behavior]
+        max_continuous_errors = 3
+        [[task.behavior.trigger]]
+            type = "periodic"
+            enabled = true
+            interval_secs = 20

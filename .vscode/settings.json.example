@@ -1,0 +1,30 @@
+{
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/*.pyo": true
+    },
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        {
+            "file": "AGENTS.md"
+        }
+    ],
+    "github.copilot.chat.reviewSelection.instructions": [
+        {
+            "file": ".github/instructions/code-review.instructions.md"
+        }
+    ],
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "ouroboros",
+            "database": "ouroboros",
+            "username": "YOUR_DB_USER",
+            "password": "YOUR_DB_PASSWORD"
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+# Remote host registry for ouro-sync and remote task execution.
+# Each host defines its SSH address, user, remote working directory, and roles.
+# Roles: cloud, head, work
+
+[hosts.ourocloud]
+    address = "ourocloud"
+    user = "ubuntu"
+    remote_dir = "~/ouroboros"
+    roles = [ "cloud" ]
+
+[hosts.ouroworld]
+    address = "ouroworld"
+    user = "ubuntu"
+    remote_dir = "~/ouroboros"
+    roles = [ "head" ]
+
+[hosts.ouroplace-1]
+    address = "ouroplace-1"
+    user = "ubuntu"
+    remote_dir = "~/ouroboros"
+    roles = [ "work" ]
+
+[hosts.ouroplace-2]
+    address = "ouroplace-2"
+    user = "ubuntu"
+    remote_dir = "~/ouroboros"
+    roles = [ "work" ]
+
+[hosts.ouroplace-3]
+    address = "ouroplace-3"
+    user = "ubuntu"
+    remote_dir = "~/ouroboros"
+    roles = [ "work" ]

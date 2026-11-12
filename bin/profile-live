@@ -1,0 +1,68 @@
+#!/bin/bash
+# Live profiling for running Python processes
+#
+# Usage:
+#   profile-live <pid> <output-file> [duration]
+#
+# Arguments:
+#   pid          - Process ID of the running Python application
+#   output-file  - Output file (.svg, .speedscope, or .json)
+#   duration     - Recording duration in seconds (default: 30)
+#
+# Example:
+#   profile-live 12345 flamegraph.svg 60
+
+set -euo pipefail
+
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <pid> <output-file> [duration]" >&2
+    echo "" >&2
+    echo "Example:" >&2
+    echo "  $0 12345 profile.svg 60" >&2
+    exit 1
+fi
+
+PID="$1"
+OUTPUT_FILE="$2"
+DURATION="${3:-30}"
+
+# Check if process exists
+if ! ps -p "$PID" > /dev/null 2>&1; then
+    echo "Error: Process $PID not found" >&2
+    exit 1
+fi
+
+# Determine output format
+case "$OUTPUT_FILE" in
+    *.svg)
+        FORMAT="flamegraph"
+        ;;
+    *.speedscope)
+        FORMAT="speedscope"
+        ;;
+    *.json)
+        FORMAT="raw"
+        ;;
+    *)
+        echo "Error: Unsupported output format. Use .svg, .speedscope, or .json" >&2
+        exit 1
+        ;;
+esac
+
+echo "Attaching to process $PID for $DURATION seconds..."
+echo "Output file: $OUTPUT_FILE"
+echo "Format: $FORMAT"
+echo ""
+
+# Record from running process
+py-spy record \
+    --pid "$PID" \
+    --format "$FORMAT" \
+    --output "$OUTPUT_FILE" \
+    --duration "$DURATION" \
+    --rate 100 \
+    --subprocesses
+
+echo ""
+echo "Profiling completed!"
+echo "Output saved to: $OUTPUT_FILE"

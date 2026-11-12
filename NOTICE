@@ -1,0 +1,43 @@
+Ouroboros
+Copyright 2026 TOYOTA MOTOR CORPORATION
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+Third-party dependencies (Cargo crates, Python packages and npm packages) are
+not included in this repository. Their exact versions are pinned in Cargo.lock,
+uv.lock and webui/package-lock.json, and their licenses are checked in CI.
+
+This repository does not include third-party source files or assets. If third-party
+material is added, record its copyright notice and license here and in REUSE.toml.
+
+The following third-party dependencies are not included in this repository, but
+they are licensed under weak copyleft licenses instead of a permissive one. They
+are installed unmodified from their package registries and remain under their
+original licenses.
+
+1. option-ext (Mozilla Public License 2.0)
+
+   Rust crate, pulled in transitively through zenoh-util, shellexpand, dirs and
+   dirs-sys.
+   Source: https://github.com/soc/option-ext
+
+
+2. certifi (Mozilla Public License 2.0)
+
+   Python package, pulled in transitively through requests (ray) and pyproj.
+   Source: https://github.com/certifi/python-certifi
+
+
+3. sumolib and traci (Eclipse Public License 2.0)
+
+   Python packages used directly by the simulation layer. They are part of
+   Eclipse SUMO.
+   Source: https://github.com/eclipse-sumo/sumo
+
+
+4. lightningcss (Mozilla Public License 2.0)
+
+   npm package used only at build time (through @tailwindcss/node and vite). It
+   is not part of the WebUI bundle.
+   Source: https://github.com/parcel-bundler/lightningcss

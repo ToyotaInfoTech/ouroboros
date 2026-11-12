@@ -1,0 +1,3 @@
+{
+  "1118053": "GHSA-rmmr-r34h-pfm5: malicious versions (1.161.9, 1.161.12) were yanked from npm. Currently installed 1.161.6 is the last safe version. No patched version available from TanStack yet."
+}

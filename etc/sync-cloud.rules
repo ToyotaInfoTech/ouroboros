@@ -1,0 +1,45 @@
+# rsync filter rules for cloud role hosts (e.g. ourocloud)
+# Usage: rsync --filter="merge etc/sync-cloud.rules" ...
+
+# Exclude specific files
+- .gitignore
+
+# Binaries
++ /target/
++ /target/x86_64-unknown-linux-gnu/
++ /target/x86_64-unknown-linux-gnu/debug/
++ /target/x86_64-unknown-linux-gnu/debug/ourodaemon
++ /target/x86_64-unknown-linux-gnu/release/
++ /target/x86_64-unknown-linux-gnu/release/ourodaemon
+
+# Config files
++ /etc/
++ /etc/daemon_config_ray.toml
++ /etc/edge_config_base_ray.toml
++ /etc/edge_config_metadata.toml
++ /etc/edge_config_full_ray.toml
++ /etc/logging.yaml
++ /etc/zenohd/
++ /etc/zenohd/***
++ /.cargo/***
+
+# Container management
+- /container/data/
++ /container/
++ /container/docker-compose.yml
++ /container/Makefile.toml
++ /container/etc/
++ /container/etc/grafana/
++ /container/etc/grafana/***
++ /container/etc/postgresql/
++ /container/etc/postgresql/postgresql.conf
+
+# Scripts and task runner
++ /Makefile.toml
++ /bin/
++ /bin/***
++ /setenv
+# + /setenv-release
+
+# Exclude everything else
+- *

@@ -1,0 +1,40 @@
+Host ouroworld
+    Hostname 203.0.113.10
+    User myuser
+    LocalForward 5901 localhost:5901 # VNC
+    LocalForward 8265 localhost:8265 # Ray Dashboard
+    LocalForward 3000 198.51.100.10:3000 # Grafana
+    LocalForward 3001 198.51.100.10:3001 # Ourodaemon
+    LocalForward 8080 198.51.100.10:8080 # Ouroboros Daemon Metrics Serer
+    LocalForward 12345 198.51.100.10:12345 # ourodaemon remote debug
+
+Host bastion
+    Hostname 203.0.113.10
+    User myuser
+
+Host ouro*
+    User myuser
+    ForwardAgent yes
+    ProxyCommand ssh -W %h:%p bastion
+
+Host ourocloud
+    Hostname 198.51.100.10
+    User myuser
+Host ouroplace-1
+    Hostname 198.51.100.21
+    User myuser
+Host ouroplace-2
+    Hostname 198.51.100.22
+    User myuser
+Host ouroplace-3
+    Hostname 198.51.100.23
+    User myuser
+Host ouroplace-4
+    Hostname 198.51.100.24
+    User myuser
+Host ourocloud
+    Hostname 198.51.100.10
+    User myuser
+Host ourocicd
+    Hostname 203.0.113.20
+    User myuser

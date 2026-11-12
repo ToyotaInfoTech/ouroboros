@@ -1,0 +1,37 @@
+[package]
+    name = "ouro_schema"
+    version = { workspace = true }
+    edition = "2021"
+    rust-version = { workspace = true }
+    repository = "https://github.com/ToyotaInfoTech/ouroboros"
+    license = { workspace = true }
+    publish = { workspace = true }
+
+[lib]
+    name = "ouro_schema"
+    path = "src/lib.rs"
+
+[dependencies]
+    ouro_state = { path = "../ouro_state" }
+    ouro_common = { path = "../ouro_common" }
+    serde = { workspace = true }
+    time = { workspace = true }
+    sqlx = { workspace = true }
+    anyhow = { workspace = true }
+    ciborium = { workspace = true }
+    sysinfo = { workspace = true }
+    tokio = { workspace = true }
+    tracing = { workspace = true }
+    tracing-attributes = { workspace = true }
+    async-trait = { workspace = true }
+    paste = { workspace = true }
+    # Optional daemon-only dependencies
+    serde-value = { workspace = true, optional = true }
+    erased-serde = { workspace = true, optional = true }
+
+[features]
+    daemon = [ "dep:serde-value", "dep:erased-serde" ]
+
+[dev-dependencies]
+    serde = { workspace = true }
+    serde_json = { workspace = true }

@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+# Dangerous Driving Behavior Configuration
+#
+# Controls the behavior-injection runtime that runs inside each simulated
+# Edge vehicle.  Set enabled = false (or remove this file) to disable all
+# abnormal driving behaviors.
+
+enabled = true
+
+# Probability of activating a behavior per vehicle per second.
+# 0.1 = 10% chance per vehicle per second.
+probability = 0.1
+
+# Minimum seconds between two activations on the same vehicle.
+cooldown_sec = 60
+
+# Fixed RNG seed for reproducibility (0 = use edge_id hash only).
+seed = 42
+
+# Python pack(s) to load.  "pack_dangerous" imports the built-in 7 behaviors.
+# Additional TOML-only packs can be placed as directories under
+# python/ouroboros/world/behaviors/ and listed here by folder name.
+packs = [ "pack_dangerous" ]
+
+# Which behaviors are eligible for random activation.
+# Remove an entry here to disable that behavior without uninstalling it.
+enabled_kinds = [
+    "hard_brake",
+    "jerk_accel",
+    "sharp_steer",
+    "lane_depart",
+    "red_light_run",
+    "wrong_way",
+    "minor_collision",
+]
+
+# Per-behavior parameter overrides.
+# Keys must match the behavior name; values override class-level defaults.
+
+[params.hard_brake]
+    duration_ms = 800
+    decel = 8.0
+    min_speed = 5.0
+
+[params.jerk_accel]
+    duration_ms = 1200
+    accel = 6.0
+    boost_speed = 30.0
+    max_speed_threshold = 2.0
+
+[params.sharp_steer]
+    duration_ms = 1200
+    change_duration_ms = 600
+
+[params.lane_depart]
+    drift_phase_ms = 3000
+    return_phase_ms = 2000
+    max_lat_offset = 2.0
+
+[params.red_light_run]
+    duration_ms = 4000
+    max_dist = 30.0
+    target_speed = 8.0
+    target_accel = 3.0
+
+[params.wrong_way]
+    duration_ms = 5000
+    max_speed_threshold = 8.0
+    target_speed = 6.0
+    target_accel = 2.5
+
+[params.minor_collision]
+    duration_ms = 1500
+    max_leader_gap = 10.0
+    speed_boost = 3.0

@@ -1,0 +1,85 @@
+<!--
+  SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+  SPDX-License-Identifier: Apache-2.0
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Ouroboros</title>
+  <desc id="description">A slender, faceted orange serpent holds its tail between compact jaws, with a quietly commanding amber gaze. Warm shaded surfaces and translucent highlights give it depth. Layers of soft silver mist pass behind and across its body, suggesting a mysterious presence. Fine branching seams quietly evoke a computer network within the recursive silhouette.</desc>
+  <defs>
+    <linearGradient id="copper" x1="106" y1="91" x2="415" y2="429" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb166"/>
+      <stop offset="0.3" stop-color="#f68b2e"/>
+      <stop offset="0.7" stop-color="#bd4b19"/>
+      <stop offset="1" stop-color="#efa044"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="139" y1="119" x2="316" y2="422" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffedc7"/>
+      <stop offset="0.45" stop-color="#ffd28a"/>
+      <stop offset="1" stop-color="#efac57"/>
+    </linearGradient>
+    <linearGradient id="recess" x1="266" y1="133" x2="427" y2="354" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b85520"/>
+      <stop offset="0.65" stop-color="#7a3017"/>
+      <stop offset="1" stop-color="#bd692e"/>
+    </linearGradient>
+    <linearGradient id="mist" x1="54" y1="327" x2="460" y2="226" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#aab9c8" stop-opacity="0"/>
+      <stop offset="0.2" stop-color="#d8e3e9" stop-opacity="0.75"/>
+      <stop offset="0.5" stop-color="#e6e9ed" stop-opacity="0.8"/>
+      <stop offset="0.8" stop-color="#fff0d9" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#d8e3e9" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="relief" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="1" dy="5" stdDeviation="4" flood-color="#44281c" flood-opacity="0.32"/>
+    </filter>
+    <filter id="haze" x="-32" y="-32" width="576" height="576" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="wisp" x="-32" y="-32" width="576" height="576" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <path id="back-mist" d="M67 302 C26 231 108 181 202 186 C291 191 367 151 425 113"/>
+    <path id="front-mist" d="M62 348 C118 300 170 338 202 366 C250 412 362 404 428 343 C459 314 464 288 455 258"/>
+    <path id="high-mist" d="M99 177 C159 135 174 174 243 169 C288 165 306 138 342 123"/>
+  </defs>
+  <g fill="none" stroke="url(#mist)" stroke-linecap="round" filter="url(#haze)">
+    <use href="#back-mist" stroke-width="30" opacity="0.55"/>
+    <use href="#front-mist" stroke-width="32" opacity="0.3" transform="translate(-6 12)"/>
+  </g>
+  <g id="serpent" filter="url(#relief)">
+  <path d="M307 139 L355 132 L391 146 L426 211 L441 285 L415 359 L358 414 L279 447 L192 430 L122 389 L78 299 L78 217 L109 154 L159 111 L207 88 L237 98 L216 120 L168 150 L134 203 L122 266 L148 330 L199 369 L264 389 L326 369 L365 326 L390 268 L383 209 L359 164 L322 154 Z" fill="url(#copper)" stroke="#a64e22" stroke-opacity="0.7" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M204 111 L158 151 L122 207 L112 261 L132 325 L181 379 L251 403 L317 394 L368 359 L328 409 L265 429 L192 413 L135 375 L99 315 L92 255 L105 197 L137 151 Z" fill="url(#amber)" opacity="0.92"/>
+  <g fill="url(#copper)">
+    <path d="M88 238 L119 219 L113 239 L90 255 Z"/>
+    <path d="M110 328 L143 338 L162 359 L123 347 Z"/>
+    <path d="M235 400 L254 420 L278 431 L265 400 Z"/>
+  </g>
+  <g fill="none" stroke="url(#amber)" stroke-opacity="0.85" stroke-width="3.5" stroke-linejoin="miter">
+    <path d="M105 227 L102 240 L97 251 M102 240 L113 237"/>
+    <path d="M123 337 L138 346 L155 353 M138 346 L143 340"/>
+    <path d="M244 405 L258 416 L273 426 M258 416 L270 408"/>
+  </g>
+  <path d="M380 188 L410 228 L420 283 L401 338 L365 375 L387 322 L397 271 Z" fill="url(#recess)" opacity="0.82"/>
+  <path d="M391 221 L403 260 L398 295 L387 323 M400 282 L412 296 L408 310" fill="none" stroke="url(#copper)" stroke-opacity="0.85" stroke-width="3.5" stroke-linejoin="miter"/>
+  <path d="M160 112 L110 155 L79 218 V298 M416 359 L359 414 L280 446" fill="none" stroke="#fff0d2" stroke-opacity="0.3" stroke-width="2"/>
+  <path d="M282 132 L326 133 L349 150 L332 164 L308 164 L289 152 Z" fill="#34322f"/>
+  <path d="M301 147 L350 139 L380 157 L393 186 L359 167 L326 159 Z" fill="url(#amber)" stroke="#a64e22" stroke-opacity="0.7" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M260 135 L282 144 L309 159 L341 157 L332 169 L307 173 L284 161 L257 145 Z" fill="url(#copper)" stroke="#a64e22" stroke-opacity="0.7" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M287 153 L308 166 L331 163 L319 169 L305 169 Z" fill="url(#recess)" opacity="0.82"/>
+  <path d="M195 104 L205 82 L230 89 L250 80 L279 94 L296 109 L321 118 L344 140 L341 150 L319 147 L301 137 L281 145 L261 145 L242 129 L224 124 L205 134 L214 109 Z" fill="url(#copper)" stroke="#a64e22" stroke-opacity="0.7" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M211 99 L228 98 L246 108 L254 124 L237 116 L215 124 L224 109 Z" fill="url(#amber)" opacity="0.92"/>
+  <path d="M249 121 L262 130 L280 130 L270 142 L257 137 Z" fill="url(#recess)" opacity="0.82"/>
+  <path d="M253 109 L283 115 L275 123 L266 122 L256 117 Z" fill="#34322f"/>
+  <path d="M261 113 L278 116 L271 119 L264 117 Z" fill="#e9ad42"/>
+  <path d="M326 130 L336 137 L331 140 L325 136 Z" fill="#34322f"/>
+  <path d="M321 143 L331 148 L323 156 Z" fill="#ffe0a0"/>
+  <path d="M317 163 L325 157 L327 162 Z" fill="#ffe0a0"/>
+  </g>
+  <g fill="none" stroke="url(#mist)" stroke-linecap="round">
+    <use href="#front-mist" stroke-width="27" opacity="0.52" filter="url(#haze)"/>
+    <use href="#front-mist" stroke-width="7" opacity="0.4" filter="url(#wisp)"/>
+    <use href="#high-mist" stroke-width="18" opacity="0.32" filter="url(#haze)"/>
+    <use href="#high-mist" stroke-width="3" opacity="0.28" filter="url(#wisp)"/>
+    <path d="M117 365 C172 342 212 419 292 412 C355 406 404 371 429 335" stroke-width="3" opacity="0.25" filter="url(#wisp)"/>
+  </g>
+</svg>

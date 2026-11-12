@@ -1,0 +1,57 @@
+{
+    "mode": "router",
+    "plugins": {
+        "storage_manager": {
+            // "volumes": {
+            //     "fs": {}
+            // },
+            // "storages": {
+            //     // configuration of a "demo" storage using the "fs" volume
+            //     "event_metadata": {
+            //         // the key expression this storage will subscribes to
+            //         "key_expr": "edge/*/log/metadata",
+            //         "volume": {
+            //             "id": "fs",
+            //             "dir": "data",
+            //             "create_dirs": true
+            //         }
+            //     }
+            // }
+        }
+    },
+    // NOTE: both listeners accept connections from any interface. 7448 is unencrypted and
+    // unauthenticated: restrict it with a firewall/VPC, and enable TLS/ACL for 7447.
+    // 待ち受けるエンドポイント
+    "listen": {
+        "endpoints": [
+            // Edgeからの WAN/TLS 接続
+            "tcp/0.0.0.0:7447",
+            // VPC 内アプリケーション向けの非TLS (private network)
+            "tcp/0.0.0.0:7448"
+        ]
+    },
+    // TLS 設定（WAN 側用）
+    // "tls": {
+    //     "cert_file": "etc/certs/server.crt",
+    //     "key_file": "/etc/certs/server.key",
+    //     // IoT側 router の証明書を検証したい場合は CA も設定可能
+    //     "ca_file": "/etc/zenoh/certs/ca.crt",
+    //     "verify_client": true
+    // },
+    // セッション上限（デバイス数が多い場合は増やす）
+    "transport": {
+        "unicast": {
+            "max_sessions": 4096,
+            "accept_pending": 200,
+            "max_links": 1
+        },
+    },
+    "scouting": {
+        "multicast": {
+            "enabled": false
+        }
+    },
+    "adminspace": {
+        "enabled": true
+    }
+}

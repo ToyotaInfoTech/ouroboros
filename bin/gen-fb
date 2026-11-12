@@ -1,0 +1,17 @@
+#!/bin/sh
+# Generate FlatBuffers code for Rust and Python
+
+##
+## Prerequisites:
+##
+# Install FlatBuffers compiler (flatc) if not already installed:
+# git clone https://github.com/google/flatbuffers.git
+# cd flatbuffers
+# git checkout v25.9.23   # ← crate と揃える
+# cmake -B build
+# cmake --build build --target flatc
+
+set -xe
+
+flatc --rust -o crates/ouro_edge/src/gen schema/fb/*.fbs
+flatc --python --gen-onefile -o python/ouroboros/gen schema/fb/*.fbs

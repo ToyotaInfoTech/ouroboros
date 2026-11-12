@@ -1,0 +1,18 @@
+// SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+// SPDX-License-Identifier: Apache-2.0
+
+
+// FlatBuffers schema for RPC
+namespace fb.rpc;
+
+table Request {
+    id: uint64;
+    method: string;
+    params: [ubyte];
+}
+
+table Response {
+    id: uint64;
+    result: [ubyte];
+    error: string;
+}

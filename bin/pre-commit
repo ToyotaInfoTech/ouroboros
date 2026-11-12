@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Pre-commit hook: runs formatting and lint checks before committing.
+# Install: cp bin/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Or:      ln -sf ../../bin/pre-commit .git/hooks/pre-commit
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+failed=0
+
+echo -e "${YELLOW}Running pre-commit checks...${NC}"
+
+# --- Rust ---
+if git diff --cached --name-only | grep -qE '\.rs$'; then
+    echo -n "  Rust fmt...    "
+    if cargo fmt --all -- --check > /dev/null 2>&1; then
+        echo -e "${GREEN}OK${NC}"
+    else
+        echo -e "${RED}FAIL${NC} (run 'cargo fmt' to fix)"
+        failed=1
+    fi
+
+    echo -n "  Rust clippy... "
+    if cargo clippy --workspace --all-targets -- -D warnings > /dev/null 2>&1; then
+        echo -e "${GREEN}OK${NC}"
+    else
+        echo -e "${RED}FAIL${NC}"
+        failed=1
+    fi
+fi
+
+# --- Python ---
+if git diff --cached --name-only | grep -qE '\.py$'; then
+    if command -v ruff > /dev/null 2>&1; then
+        echo -n "  Python ruff... "
+        if ruff check python/ > /dev/null 2>&1; then
+            echo -e "${GREEN}OK${NC}"
+        else
+            echo -e "${RED}FAIL${NC}"
+            failed=1
+        fi
+    fi
+fi
+
+# --- WebUI ---
+if git diff --cached --name-only | grep -qE '^webui/.*\.(ts|tsx)$'; then
+    if [[ -f webui/node_modules/.bin/eslint ]]; then
+        echo -n "  WebUI lint...  "
+        if (cd webui && npx eslint --quiet src/) > /dev/null 2>&1; then
+            echo -e "${GREEN}OK${NC}"
+        else
+            echo -e "${RED}FAIL${NC}"
+            failed=1
+        fi
+    fi
+fi
+
+if [[ $failed -ne 0 ]]; then
+    echo -e "\n${RED}Pre-commit checks failed.${NC} Fix the issues above or use --no-verify to skip."
+    exit 1
+fi
+
+echo -e "${GREEN}All checks passed.${NC}"

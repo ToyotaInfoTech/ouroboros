@@ -1,0 +1,10 @@
+/* SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+
+@import "tailwindcss";
+
+/* Force crosshair cursor on the maplibre canvas in draw mode */
+.rect-picker-draw .maplibregl-canvas {
+    cursor: crosshair !important;
+}

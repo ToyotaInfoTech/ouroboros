@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+play-jsonl nagoya1.jsonl -l ./etc/logging.yaml -- lldb-server g 0.0.0.0:12345 -- ./target/${BUILD_PROFILE}/ouroedge -i foo -m bar -c ./etc/edge_config.toml

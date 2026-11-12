@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
+GRAFANA_USER="${GRAFANA_USER:-admin}"
+GRAFANA_PASS="${GRAFANA_PASS:-admin}"
+OUT_DIR="${OUT_DIR:-$(dirname "$0")/../container/etc/grafana/provisioning/dashboards}"
+
+mkdir -p "$OUT_DIR"
+
+echo "Exporting dashboards from $GRAFANA_URL to $OUT_DIR"
+
+uids=$(curl -sf -u "$GRAFANA_USER:$GRAFANA_PASS" \
+  "$GRAFANA_URL/api/search?type=dash-db&limit=1000" \
+  | jq -r '.[].uid')
+
+if [[ -z "$uids" ]]; then
+  echo "No dashboards found."
+  exit 0
+fi
+
+count=0
+while IFS= read -r uid; do
+  response=$(curl -sf -u "$GRAFANA_USER:$GRAFANA_PASS" \
+    "$GRAFANA_URL/api/dashboards/uid/$uid")
+
+  slug=$(echo "$response" | jq -r '.meta.slug')
+  echo "$response" \
+    | jq '.dashboard | del(.id)' \
+    > "$OUT_DIR/${slug}.json"
+
+  echo "  Exported: $slug (uid=$uid)"
+  count=$((count + 1))
+done <<< "$uids"
+
+echo "Done. $count dashboard(s) exported to $OUT_DIR"

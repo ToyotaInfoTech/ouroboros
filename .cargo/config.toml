@@ -1,0 +1,15 @@
+[build]
+    rustflags = [ "--cfg", "tokio_allow_from_blocking_fd" ]
+
+[alias]
+    b = "build -q --target aarch64-apple-darwin"
+    B = "build -q --release --target aarch64-apple-darwin"
+    r = "run -q"
+    k = "check -q"
+    c = "clean -q"
+    t = "test"
+    m = "make"
+    T = "test -- --nocapture"
+    e = "tree -e features"
+    x = "zigbuild --workspace --target x86_64-unknown-linux-gnu"
+    X = "zigbuild --release --workspace --target x86_64-unknown-linux-gnu"

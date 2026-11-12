@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -xe
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT=$(dirname "${SCRIPT_DIR}")
+
+sumo \
+    -c /home/ubuntu/numo/nagoya.sumocfg \
+    -d 100 \
+    --remote-port 8813

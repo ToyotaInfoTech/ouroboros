@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Watch a GitHub Actions run and send a macOS notification on completion.
+#
+# Usage:
+#   bin/ci-watch <run_id>
+#   bin/ci-watch <run_id> [--title "Custom Title"]
+
+set -euo pipefail
+
+RUN_ID="${1:?Usage: bin/ci-watch <run_id>}"
+TITLE="${2:-Ouroboros CI}"
+
+gh run watch "${RUN_ID}"
+STATUS=$(gh run view "${RUN_ID}" --json conclusion -q '.conclusion')
+
+case "${STATUS}" in
+    success)
+        osascript -e "display notification \"Run #${RUN_ID} passed ✅\" with title \"${TITLE}\" sound name \"Glass\""
+        ;;
+    failure)
+        osascript -e "display notification \"Run #${RUN_ID} FAILED ❌\" with title \"${TITLE}\" sound name \"Basso\""
+        ;;
+    cancelled)
+        osascript -e "display notification \"Run #${RUN_ID} cancelled\" with title \"${TITLE}\""
+        ;;
+    *)
+        osascript -e "display notification \"Run #${RUN_ID}: ${STATUS}\" with title \"${TITLE}\""
+        ;;
+esac

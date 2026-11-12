@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+# REUSE annotations for files that cannot carry an inline SPDX header
+# (documents, lock files, generated code, binaries, extensionless scripts).
+# Source files are expected to carry their own header.
+# See https://reuse.software/spec-3.3/ and NOTICE.
+
+version = 1
+
+# First-party files.
+[[annotations]]
+path = [
+    ".cargo/**",
+    ".env",
+    ".gitignore",
+    ".python-version",
+    ".vscode/**",
+    "**/*.md",
+    "**/.gitignore",
+    "**/Cargo.toml",
+    "Cargo.toml",
+    "NOTICE",
+    "ansible/ansible.cfg",
+    "ansible/roles/grafana/files/gpu-dashboard.json",
+    "ansible/roles/grafana/files/zenoh-dashboard.json",
+    "ansible/roles/grafana/files/zenoh-exporter.service",
+    "ansible/roles/ubuntu/templates/hosts.j2",
+    "ansible/roles/user/files/bash_aliases",
+    "ansible/roles/user/files/gitconfig",
+    "bin/**",
+    "container/etc/grafana/provisioning/dashboards/*.json",
+    "container/etc/postgresql/postgresql.conf",
+    "crates/ouro_edge/src/gen/*.rs",
+    "docs/image/*.png",
+    "docs/index.html",
+    "etc/sumo-scenarios/triangle.*",
+    "etc/sync-*.rules",
+    "etc/zenohd/zenohd.json5",
+    "examples/dot.env.example",
+    "examples/dot.ssh/config",
+    "python/ouroboros/gen/*.py",
+    "rust-toolchain.toml",
+    "setenv",
+    "setenv-release",
+    "uv.lock",
+    "webui/.npmrc",
+    "webui/.nsprc",
+    "webui/index.html",
+    "webui/package-lock.json",
+    "webui/package.json",
+    "webui/tsconfig.json",
+    "webui/tsconfig.app.json",
+    "webui/tsconfig.node.json",
+]
+SPDX-FileCopyrightText = "Copyright 2026 TOYOTA MOTOR CORPORATION"
+SPDX-License-Identifier = "Apache-2.0"

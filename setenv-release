@@ -1,0 +1,33 @@
+# This script must be sourced, not executed
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    echo "Error: This script must be sourced, not executed directly."
+    echo "Usage: source setenv"
+    echo "   or: . setenv"
+    exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Activate Python virtual environment first
+. "$SCRIPT_DIR/.venv/bin/activate"
+
+# Then add bin directory to PATH (after venv activation)
+export PATH="$SCRIPT_DIR/bin:$PATH"
+
+echo "Environment configured:"
+echo "  Python venv: activated"
+echo "  PATH: $SCRIPT_DIR/bin added to front"
+
+function rgp() {
+    rg --vimgrep $@ | cut -d: -f1-2
+}
+
+export OURO_HOME="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
+export NUMO_HOME="${HOME}/numo"
+export PYTHONPATH="${OURO_HOME}/python"
+
+export OURO_PANIC_ON_ERROR=1
+export RUST_BACKTRACE=full
+export RUST_LIB_BACKTRACE=1
+export RUST_LOG=info
+export RUST_LOG_COLOR=true

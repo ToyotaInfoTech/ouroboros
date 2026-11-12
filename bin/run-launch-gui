@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+
+python -m ouroboros.main \
+    sumo local \
+    --min-edges-per-place 1 \
+    --max-places 12 \
+    "$@" \
+    -- \
+    sumo-gui \
+    -c "${NUMO_HOME}/nagoya.sumocfg" \
+    -d 200 \
+    --no-step-log \
+    --start
+#    -c ${ROOT}/etc/sumo-scenarios/triangle.sumocfg \

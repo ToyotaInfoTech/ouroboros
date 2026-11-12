@@ -1,0 +1,97 @@
+[workspace]
+    members = [ "crates/*" ]
+    resolver = "2"
+    [workspace.package]
+        version = "0.5.0"
+        rust-version = "1.93.0"
+        license = "Apache-2.0"
+        publish = false
+
+    [workspace.dependencies]
+        anyhow = { version = "1.0.100", default-features = false }
+        axum = "0.8.9"
+        tower = { version = "0.5.3", default-features = false }
+        clap = { version = "4.6.1", features = [
+            "derive",
+            "color",
+            "usage",
+            "cargo",
+        ] }
+        async-trait = { version = "0.1.89", default-features = false }
+        futures = { version = "0.3.32", default-features = false }
+        serde = "1.0.228"
+        serde_json = { version = "1.0.149", default-features = false }
+        serde-value = { version = "0.7.0", default-features = false }
+        tokio = { version = "1.52.1", default-features = false, features = [
+            "rt-multi-thread",
+            "macros",
+            "sync",
+            "tracing",
+            # "time",
+            # "signal",
+            # "net",
+            # "io-util",
+        ] }
+        tokio-util = { version = "0.7.18", features = [ "codec" ] }
+        tracing = "0.1.44"
+        tracing-attributes = "0.1.31"
+        tracing-subscriber = { version = "0.3.23", default-features = false, features = [
+            "std",
+            "fmt",
+            "env-filter",
+            "ansi",
+        ] }
+        flatbuffers = "25.9.23"
+        sqlx = { version = "0.8.6", default-features = false, features = [
+            "sqlite",
+            "runtime-tokio",
+            "postgres",
+            "time",
+            "json",
+            # "runtime-tokio-rustls",
+            "macros",
+        ] }
+        zenoh = { version = "1.9.0", default-features = false, features = [
+            "transport_tcp",
+            "transport_udp",
+        ] }
+        #zenoh-config = "1.7.2"
+        tower-http = "0.6.11"
+        time = { version = "0.3.45", default-features = false, features = [
+            "serde",
+            # "formatting",
+            # "parsing",
+            "local-offset",
+        ] }
+        ciborium = { version = "0.2.2", default-features = false, features = [
+            "std",
+        ] }
+        crossbeam = { version = "0.8.4", default-features = false }
+        completion = "0.2.1"
+        num_cpus = { version = "1.17.0", default-features = false }
+        toml = { version = "1.1.0", default-features = false, features = [
+            "serde",
+            # "std",
+        ] }
+        uuid = { version = "1.23.1", features = [ "v7" ] }
+        derivative = { version = "2.2.0", default-features = false }
+        strum_macros = { version = "0.28.0", default-features = false }
+        libc = { version = "0.2.186", default-features = false }
+        paste = { version = "1.0", default-features = false }
+        rand = "0.10.1"
+        tempfile = "3"
+        sysinfo = { version = "0.38.4", features = [ "system" ] }
+        erased-serde = "0.4"
+        rust-embed = { version = "8", features = [
+            "mime-guess",
+            "debug-embed",
+        ] }
+
+[profile.dev]
+    debug = 2
+    opt-level = 0
+
+[profile.release]
+    strip = "debuginfo"
+    lto = true
+    #codegen-units = 1

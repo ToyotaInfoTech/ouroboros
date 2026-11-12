@@ -1,0 +1,16 @@
+<!--
+  SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+  SPDX-License-Identifier: Apache-2.0
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img">
+  <title>Ouroboros</title>
+  <defs>
+    <linearGradient id="snake" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2dd4bf"/>
+      <stop offset="1" stop-color="#15803d"/>
+    </linearGradient>
+  </defs>
+  <path d="M47.56 16.44A22 22 0 1 1 37.69 10.75" fill="none" stroke="url(#snake)" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="40.6" cy="11.5" rx="7.5" ry="5.5" transform="rotate(15 40.6 11.5)" fill="url(#snake)"/>
+  <circle cx="43.7" cy="9.65" r="1.4" fill="#ffffff"/>
+</svg>

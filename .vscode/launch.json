@@ -1,0 +1,73 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "daemon (local)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/debug/ourodaemon",
+            "args": [
+                "-c",
+                "${workspaceFolder}/etc/daemon_config_dev.toml"
+            ],
+            "sourceMap": {
+                "${workspaceFolder}/crates/ouro_daemon/src": "${workspaceFolder}/crates/ouro_daemon/src",
+                "${workspaceFolder}/crates/ouro_core/src": "${workspaceFolder}/crates/ouro_core/src",
+                "${workspaceFolder}/crates/ouro_common/src": "${workspaceFolder}/crates/ouro_common/src",
+                "${workspaceFolder}/crates/ouro_state/src": "${workspaceFolder}/crates/ouro_state/src"
+            }
+        },
+        {
+            "name": "edge (local)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/debug/ouroedge",
+            "args": [
+                "-c",
+                "${workspaceFolder}/etc/edge_config_dev.toml",
+                "-P"
+            ],
+            "sourceMap": {
+                "${workspaceFolder}/crates/ouro_edge_main/src": "${workspaceFolder}/crates/ouro_edge_main/src",
+                "${workspaceFolder}/crates/ouro_edge/src": "${workspaceFolder}/crates/ouro_edge/src",
+                "${workspaceFolder}/crates/ouro_core/src": "${workspaceFolder}/crates/ouro_core/src",
+                "${workspaceFolder}/crates/ouro_common/src": "${workspaceFolder}/crates/ouro_common/src",
+                "${workspaceFolder}/crates/ouro_state/src": "${workspaceFolder}/crates/ouro_state/src"
+            }
+        },
+        {
+            "name": "daemon (remote)",
+            "type": "lldb",
+            "request": "attach",
+            "targetCreateCommands": [
+                "target create /home/ubuntu/r/ouroboros/target/debug/ourodaemon"
+            ],
+            "processCreateCommands": [
+                "gdb-remote ourocloud:12345"
+            ],
+            "sourceMap": {
+                "${workspaceFolder}/crates/ouro_daemon/src": "/home/ubuntu/r/ouroboros/crates/ouro_daemon/src"
+            }
+        },
+        {
+            "name": "edge (remote)",
+            "type": "lldb",
+            "request": "attach",
+            "targetCreateCommands": [
+                "target create ${workspaceFolder}/target/x86_64-unknown-linux-gnu/debug/ouroedge"
+            ],
+            "processCreateCommands": [
+                "gdb-remote localhost:12345"
+            ],
+            "sourceMap": {
+                "${workspaceFolder}/crates/ouro_edge/src": "/home/ubuntu/r/ouroboros/crates/ouro_edge/src",
+                "${workspaceFolder}/crates/ouro_core/src": "/home/ubuntu/r/ouroboros/crates/ouro_core/src",
+                "${workspaceFolder}/crates/ouro_common/src": "/home/ubuntu/r/ouroboros/crates/ouro_common/src",
+                "${workspaceFolder}/crates/ouro_state/src": "/home/ubuntu/r/ouroboros/crates/ouro_state/src"
+            }
+        },
+    ]
+}

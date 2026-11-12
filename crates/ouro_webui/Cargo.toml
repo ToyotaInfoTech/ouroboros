@@ -1,0 +1,31 @@
+[package]
+    name = "ouro_webui"
+    version = { workspace = true }
+    edition = "2021"
+    rust-version = { workspace = true }
+    repository = "https://github.com/ToyotaInfoTech/ouroboros"
+    license = { workspace = true }
+    publish = { workspace = true }
+    autobins = false
+
+[lib]
+    name = "ouro_webui"
+    path = "src/lib.rs"
+
+[dependencies]
+    ouro_common = { path = "../ouro_common" }
+    ouro_schema = { path = "../ouro_schema", features = [ "daemon" ] }
+    axum = { workspace = true, features = [ "ws" ] }
+    tower = { workspace = true }
+    serde = { workspace = true }
+    serde_json = { workspace = true }
+    serde-value = { workspace = true }
+    sqlx = { workspace = true }
+    time = { workspace = true }
+    tokio = { workspace = true, features = [ "net", "time" ] }
+    tracing = { workspace = true }
+    rust-embed = { workspace = true }
+    mime_guess = "2"
+
+[dev-dependencies]
+    tower = { workspace = true, features = [ "util" ] }

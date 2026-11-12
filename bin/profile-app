@@ -1,0 +1,83 @@
+#!/bin/bash
+# Profiling wrapper script for Python application
+#
+# Usage:
+#   profile-app <output-file> -- <python-command> [args...]
+#
+# Example:
+#   profile-app flamegraph.svg -- python -m ouroboros.main sumo local -- ...
+#   profile-app profile.speedscope -- python -m ouroboros.main sumo remote ...
+#
+# Supported output formats:
+#   - .svg (FlameGraph)
+#   - .speedscope (Speedscope format)
+#   - .json (raw JSON format)
+
+set -euo pipefail
+
+if [ $# -lt 3 ] || [ "$2" != "--" ]; then
+    echo "Usage: $0 <output-file> -- <python-command> [args...]" >&2
+    echo "" >&2
+    echo "Examples:" >&2
+    echo "  $0 profile.svg -- python -m ouroboros.main sumo local -- ..." >&2
+    echo "  $0 profile.speedscope -- python -m ouroboros.main sumo remote ..." >&2
+    exit 1
+fi
+
+OUTPUT_FILE="$1"
+shift 2  # Remove output file and "--"
+
+# Determine output format based on file extension
+case "$OUTPUT_FILE" in
+    *.svg)
+        FORMAT="flamegraph"
+        ;;
+    *.speedscope)
+        FORMAT="speedscope"
+        ;;
+    *.json)
+        FORMAT="raw"
+        ;;
+    *)
+        echo "Error: Unsupported output format. Use .svg, .speedscope, or .json" >&2
+        exit 1
+        ;;
+esac
+
+echo "Starting profiling with py-spy..."
+echo "Output file: $OUTPUT_FILE"
+echo "Format: $FORMAT"
+echo "Command: $*"
+echo ""
+
+# Run py-spy with the specified format
+py-spy record \
+    --format "$FORMAT" \
+    --output "$OUTPUT_FILE" \
+    --rate 100 \
+    --subprocesses \
+    -- "$@"
+
+echo ""
+echo "Profiling completed!"
+echo "Output saved to: $OUTPUT_FILE"
+
+# Provide viewing instructions
+case "$FORMAT" in
+    flamegraph)
+        echo ""
+        echo "To view the FlameGraph, open $OUTPUT_FILE in a web browser:"
+        echo "  firefox $OUTPUT_FILE"
+        echo "  or"
+        echo "  chrome $OUTPUT_FILE"
+        ;;
+    speedscope)
+        echo ""
+        echo "To view the Speedscope profile, upload $OUTPUT_FILE to:"
+        echo "  https://www.speedscope.app/"
+        ;;
+    raw)
+        echo ""
+        echo "Raw JSON profile saved. You can process this with custom tools."
+        ;;
+esac

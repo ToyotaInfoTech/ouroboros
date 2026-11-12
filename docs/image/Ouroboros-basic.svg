@@ -1,0 +1,34 @@
+<!--
+  SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+  SPDX-License-Identifier: Apache-2.0
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Ouroboros - Basic</title>
+  <desc id="description">A slender, faceted orange serpent holds its tail between compact jaws. An amber eye conveys quiet authority, and branching seams subtly evoke a computer network. This flat-color version has no gradients, shadows, mist, or translucent surfaces.</desc>
+  <path d="M307 139 L355 132 L391 146 L426 211 L441 285 L415 359 L358 414 L279 447 L192 430 L122 389 L78 299 L78 217 L109 154 L159 111 L207 88 L237 98 L216 120 L168 150 L134 203 L122 266 L148 330 L199 369 L264 389 L326 369 L365 326 L390 268 L383 209 L359 164 L322 154 Z" fill="#ed7926" stroke="#a64e22" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M204 111 L158 151 L122 207 L112 261 L132 325 L181 379 L251 403 L317 394 L368 359 L328 409 L265 429 L192 413 L135 375 L99 315 L92 255 L105 197 L137 151 Z" fill="#ffcc88"/>
+  <g fill="#ed7926">
+    <path d="M88 238 L119 219 L113 239 L90 255 Z"/>
+    <path d="M110 328 L143 338 L162 359 L123 347 Z"/>
+    <path d="M235 400 L254 420 L278 431 L265 400 Z"/>
+  </g>
+  <g fill="none" stroke="#ffcc88" stroke-width="3.5" stroke-linejoin="miter">
+    <path d="M105 227 L102 240 L97 251 M102 240 L113 237"/>
+    <path d="M123 337 L138 346 L155 353 M138 346 L143 340"/>
+    <path d="M244 405 L258 416 L273 426 M258 416 L270 408"/>
+  </g>
+  <path d="M380 188 L410 228 L420 283 L401 338 L365 375 L387 322 L397 271 Z" fill="#bd4e20"/>
+  <path d="M391 221 L403 260 L398 295 L387 323 M400 282 L412 296 L408 310" fill="none" stroke="#ed7926" stroke-width="3.5" stroke-linejoin="miter"/>
+  <path d="M282 132 L326 133 L349 150 L332 164 L308 164 L289 152 Z" fill="#34322f"/>
+  <path d="M301 147 L350 139 L380 157 L393 186 L359 167 L326 159 Z" fill="#ffcc88" stroke="#a64e22" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M260 135 L282 144 L309 159 L341 157 L332 169 L307 173 L284 161 L257 145 Z" fill="#ed7926" stroke="#a64e22" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M287 153 L308 166 L331 163 L319 169 L305 169 Z" fill="#bd4e20"/>
+  <path d="M195 104 L205 82 L230 89 L250 80 L279 94 L296 109 L321 118 L344 140 L341 150 L319 147 L301 137 L281 145 L261 145 L242 129 L224 124 L205 134 L214 109 Z" fill="#ed7926" stroke="#a64e22" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M211 99 L228 98 L246 108 L254 124 L237 116 L215 124 L224 109 Z" fill="#ffcc88"/>
+  <path d="M249 121 L262 130 L280 130 L270 142 L257 137 Z" fill="#bd4e20"/>
+  <path d="M253 109 L283 115 L275 123 L266 122 L256 117 Z" fill="#34322f"/>
+  <path d="M261 113 L278 116 L271 119 L264 117 Z" fill="#e9ad42"/>
+  <path d="M326 130 L336 137 L331 140 L325 136 Z" fill="#34322f"/>
+  <path d="M321 143 L331 148 L323 156 Z" fill="#ffe0a0"/>
+  <path d="M317 163 L325 157 L327 162 Z" fill="#ffe0a0"/>
+</svg>

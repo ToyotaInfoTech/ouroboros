@@ -1,0 +1,33 @@
+#!/bin/bash
+# Top-like profiling display for Python process
+#
+# Usage:
+#   profile-top <pid>
+#
+# Example:
+#   profile-top 12345
+
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <pid>" >&2
+    echo "" >&2
+    echo "Example:" >&2
+    echo "  $0 12345" >&2
+    exit 1
+fi
+
+PID="$1"
+
+# Check if process exists
+if ! ps -p "$PID" > /dev/null 2>&1; then
+    echo "Error: Process $PID not found" >&2
+    exit 1
+fi
+
+echo "Starting top-like view for process $PID..."
+echo "Press Ctrl+C to exit"
+echo ""
+
+# Run py-spy top
+py-spy top --pid "$PID" --rate 100

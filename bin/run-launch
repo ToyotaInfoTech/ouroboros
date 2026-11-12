@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+
+export RAY_UP_enable_autoscaler_v2=0
+export RAY_enable_infeasible_task_early_exit=true
+
+EDGE_EXE="target/${BUILD_PROFILE}/ouroedge"
+
+python -m ouroboros.main \
+    sumo local \
+    -t 1 \
+    --edge-config "${OURO_HOME}/etc/edge_config_full_${WORLD_MODE}.toml" \
+    --edge-behavior-config "${OURO_HOME}/etc/dangerous_behaviors.toml" \
+    --edge-exe "${EDGE_EXE}" \
+    --max-edges-per-place 20 \
+    --max-places 1 \
+    --num-cpus-per-place 0.5 \
+    --num-gpus-per-place 0.0 \
+    --renderer-name wgpu \
+    -ew ${WORLD_MODE} \
+    "$@" \
+    -- \
+    sumo \
+    -c "${NUMO_HOME}/nagoya.sumocfg" \
+    --threads 8 \
+    --delay 0 \
+    --step-length 1 \
+    --no-step-log \
+    --scale 2.5 \
+    --lateral-resolution 0.2 \
+    --max-depart-delay 60 # Discard vehicles that can't depart within 60s to prevent infinite waiting
+    # --max-edges-per-place 50 \
+    # --max-places 24 \

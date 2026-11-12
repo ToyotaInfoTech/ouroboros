@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+
+ssh ${SSH_OPTS} ouroworld \
+    """
+    remote_dir=\$HOME/ouroboros
+    cd \${remote_dir}
+    if [ -f .venv/bin/activate ]; then . .venv/bin/activate; fi
+    export PYTHONPATH=\${remote_dir}/python:\${PYTHONPATH:-}
+    if command -v python >/dev/null 2>&1; then py_cmd=python; else py_cmd=python3; fi
+    env RAY_UP_enable_autoscaler_v2=0 RAY_enable_infeasible_task_early_exit=true \
+    \${py_cmd} -m ouroboros.main \
+    sumo local \
+    --ray-addr auto \
+    --min-edges-per-place 1 \
+    --max-places 12 \
+    --rust-log-style auto \
+    --rust-backtrace full \
+    --rust-log "ouroedge=debug" \
+    --edge-config /home/ubuntu/ouroboros/etc/edge_config.toml \
+    "$@" \
+    -- \
+    sumo \
+    -c /home/ubuntu/numo/nagoya.sumocfg \
+    -d 100 \
+    --no-step-log \
+    """
+#--start
+#    --collision.action teleport, --max-depart-delay 60 \
+#    -c ${ROOT}/etc/sumo-scenarios/triangle.sumocfg \

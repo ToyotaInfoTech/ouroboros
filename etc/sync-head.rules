@@ -1,0 +1,37 @@
+# rsync filter rules for head role hosts (e.g. ouroworld / Ray head)
+# Usage: rsync --filter="merge etc/sync-head.rules" ...
+
+# Binaries
++ /target/
++ /target/x86_64-unknown-linux-gnu/
++ /target/x86_64-unknown-linux-gnu/debug/
++ /target/x86_64-unknown-linux-gnu/debug/ouroedge
++ /target/x86_64-unknown-linux-gnu/release/
++ /target/x86_64-unknown-linux-gnu/release/ouroedge
+
+# Config files
++ /etc/
++ /etc/edge_config_base_ray.toml
++ /etc/edge_config_full_ray.toml
++ /etc/logging.yaml
++ /etc/dangerous_behaviors.toml
+
+# Python code and generated files
+- /python/**/*.md
+- /python/**/__pycache__/
+- /python/tests/
+- /python/tool/
++ /python/
++ /python/***
++ /pyproject.toml
++ /uv.lock
+
+## Scripts and task runner
++ /bin/
++ /bin/***
++ /Makefile.toml
++ /setenv
+#+ /setenv-release
+
+# Exclude everything else
+- *

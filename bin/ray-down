@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -xe
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${SCRIPT_DIR}/ray-common.sh"
+
+ssh ${SSH_OPTS} "ubuntu@${HEAD}" "cd ${WORK} && source bin/ray-common.sh && ray_down"

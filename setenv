@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# This script must be sourced, not executed
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    echo "Error: This script must be sourced, not executed directly."
+    echo "Usage: source setenv"
+    echo "   or: . setenv"
+    exit 1
+fi
+
+export BUILD_PROFILE="$(rustc -vV | awk '/host:/ {print $2}')/release"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Activate Python virtual environment first
+[ -f "$SCRIPT_DIR/.venv/bin/activate" ] && . "$SCRIPT_DIR/.venv/bin/activate"
+
+# Load credentials and listen addresses (see examples/dot.env.example); shell syntax, git-ignored
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    set -a
+    . "$SCRIPT_DIR/.env"
+    set +a
+fi
+
+# Then add bin directory to PATH (after venv activation)
+export PATH="$SCRIPT_DIR/bin:$PATH"
+
+function rgp() {
+    rg --vimgrep $@ | cut -d: -f1-2
+}
+
+export OURO_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export NUMO_HOME="${HOME}/numo"
+export PYTHONPATH="${OURO_HOME}/python"
+
+export OURO_PANIC_ON_ERROR=1
+export RUST_BACKTRACE=full
+export RUST_LIB_BACKTRACE=1
+#export RUST_LOG=info,ouroedge=trace,ourodaemon=trace,ouro_daemon=trace,ouro_common=trace,ouro_core=trace,ouro_state=trace,ouro_schema=trace,ourocli=trace,ouro_webui=trace,ouro_edge_main=trace
+export RUST_LOG=info
+export RUST_LOG_COLOR=true
+
+# Set RUNTIME_PROFILE (default: local, valid: local or ray)
+WORLD_MODE="${1:-ray}"
+if [[ "$WORLD_MODE" != "local" && "$WORLD_MODE" != "ray" ]]; then
+    echo "Error: WORLD_MODE must be 'local' or 'ray', got '$WORLD_MODE'"
+    return 1
+fi
+export WORLD_MODE

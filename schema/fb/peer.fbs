@@ -1,0 +1,80 @@
+// SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+// SPDX-License-Identifier: Apache-2.0
+
+
+// FlatBuffers schema for Peer (optimized for SUMO TraCI data)
+namespace fb.peer;
+
+table NextTLS {
+	id: string;
+	idx: int;
+	
+    dist: double;
+	signal: string;
+}
+
+table NeighborVehicle {
+	vin: string;
+	speed: double;
+	accel: double;
+	road_id: string;
+	lane_id: string;
+	lane_idx: int;
+	x: double;
+	y: double;
+	lon: double;
+	lat: double;
+	angle: double;
+}
+
+table VehicleDistance {
+    vin: string;
+    dist: double;
+}
+
+enum CameraIdEnum : byte {
+	Front = 0,
+	FrontLeft = 1,
+	FrontRight = 2,
+	RearLeft = 3,
+	RearRight = 4,
+	Rear = 5,
+}
+
+table CameraImage {
+	camera_id: CameraIdEnum;
+	image: [ubyte];
+}
+
+table Peer {
+	vin: string;
+    status: string;
+	ts: double;
+	angle: double;
+	speed: double;
+	accel: double;
+	lane_id: string;
+	lane_idx: int;
+	lane_pos: double;
+	road_id: string;
+	wait_time: double;
+	dist: double;
+	fuel_cons: double;
+	co2: double;
+	co: double;
+	nox: double;
+	pmx: double;
+	noise: double;
+	type_id: string;
+	leader: VehicleDistance;
+	next_tls: [NextTLS];
+	x: double;
+	y: double;
+	lon: double;
+	lat: double;
+	neighbor_vehicles: [NeighborVehicle];
+	camera_images: [CameraImage];
+	active_behavior: string;
+}
+
+root_type Peer;

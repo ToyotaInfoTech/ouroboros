@@ -1,0 +1,389 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+[config]
+    default_to_workspace = false
+
+[env]
+    BUILD_PROFILE = { value = "x86_64-unknown-linux-gnu/debug", condition = { env_not_set = [
+        "BUILD_PROFILE",
+    ] } }
+
+[tasks.dist-clean]
+    description = "Clean build artifacts, logs, and data"
+    script = [ '''
+#!/usr/bin/env bash
+cargo clean
+rm -rf logs/
+''' ]
+
+[tasks.gen]
+    description = "Generate FlatBuffers code"
+    script = [ "./bin/gen-fb" ]
+
+[tasks.runl]
+    description = "Run locally"
+    script = [ "./bin/run-launch -ew local --renderer-name wgpu " ]
+
+[tasks.runr]
+    description = "Run remotely"
+    script = [
+        '''
+    ssh -o ClearAllForwardings=yes ouroworld 'cd ~/ouroboros &&  ./bin/run-launch -ew ray --renderer-name wgpu'
+''',
+    ]
+
+[tasks.rup]
+    description = "Start Ray cluster"
+    dependencies = [ "rdown" ]
+    script = [ "RAY_ENABLE_WINDOWS_OR_OSX_CLUSTER=1 ./bin/ray-up" ]
+
+[tasks.rdown]
+    description = "Stop Ray cluster"
+    script = [ "RAY_ENABLE_WINDOWS_OR_OSX_CLUSTER=1 ./bin/ray-down" ]
+
+[tasks.cup]
+    description = "Start containers (use REMOTE=<host> for remote)"
+    dependencies = [ "cdown" ]
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+[ -z "${OURO_HOME}" ] && { echo "Error: OURO_HOME is not set" >&2; exit 1; }
+
+dir="${OURO_HOME}/container"
+echo "[cup] dir=${dir}"
+echo "[cup] RUST_LOGS=${RUST_LOGS}"
+. ${HOME}/.cargo/env && cd \"${dir}\" && cargo make cup && cargo make cshow
+""" ]
+
+[tasks.cdown]
+    description = "Stop containers (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+[ -z "${OURO_HOME}" ] && { echo "Error: OURO_HOME is not set"; exit 1; }
+
+dir="${OURO_HOME}/container"
+echo "[cdown] dir=${dir}"
+. ${HOME}/.cargo/env && cd ${dir} && cargo make cdown && cargo make cshow
+""" ]
+
+[tasks.cupr]
+    description = "Start containers for remote"
+    dependencies = [ "cdownr" ]
+    script = [ """ REMOTE="ourocloud" cargo make cup """ ]
+
+[tasks.cdownr]
+    description = "Stop containers for remote"
+    script = [ """ REMOTE="ourocloud" cargo make cdown """ ]
+
+[tasks.vup]
+    description = "Start VNC server"
+    script = [ "vncserver :1" ]
+
+[tasks.vdown]
+    description = "Stop VNC server"
+    script = [ "vncserver -kill :1" ]
+
+[tasks.zup]
+    description = "Start Zenoh daemon (use REMOTE=<host> for remote)"
+    dependencies = [ "zdown" ]
+    script = [
+        """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+[ -z "${OURO_HOME}" ] && { echo "Error: OURO_HOME is not set" >&2; exit 1; }
+
+echo "[zup] dir=${OURO_HOME}"
+
+rest_flag=""
+plugin_ext="so"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    plugin_ext="dylib"
+fi
+
+for search_dir in "." "$HOME/.zenoh/lib" "/opt/homebrew/lib" "/usr/local/lib" "/usr/lib"; do
+    if [[ -f "$search_dir/libzenoh_plugin_rest.$plugin_ext" ]]; then
+        rest_flag="--rest-http-port=8000"
+        break
+    fi
+done
+
+if [[ -z "$rest_flag" ]]; then
+    echo "[zup] REST plugin not found; starting zenohd without REST API"
+fi
+
+# Start zenohd in background
+cd "${OURO_HOME}" && nohup zenohd --config etc/zenohd/zenohd.json5 $rest_flag >> /tmp/zenohd.log 2>&1 &
+""",
+    ]
+
+[tasks.zdown]
+    description = "Stop Zenoh daemon (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+pkill zenohd || true
+""" ]
+
+[tasks.zupr]
+    description = "Start Zenoh daemon for remote)"
+    dependencies = [ "zdownr" ]
+    script = [ """ REMOTE="ourocloud" cargo make zup """ ]
+
+[tasks.zdownr]
+    description = "Stop Zenoh daemon for remote)"
+    script = [ """ REMOTE="ourocloud" cargo make zdown """ ]
+
+[tasks.oup]
+    description = "Start ourodaemon (use REMOTE=<host> for remote, OURO_DEBUG=1 for lldb)"
+    dependencies = [ "odown" ]
+    script = [
+        """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+[ -z "${OURO_HOME}" ] && { echo "Error: OURO_HOME is not set" >&2; exit 1; }
+
+set -xe
+
+dir="${OURO_HOME}"
+config="./etc/daemon_config_${WORLD_MODE}.toml"
+
+echo "[oup] dir=${dir} config=${config}"
+
+if [[ "${OURO_DEBUG:-}" == "1" ]]; then
+    # Start with lldb-server for remote debugging
+    cd "${dir}" && RUST_LOG=debug,sqlx=trace,sqlx_core=trace,sqlx_core::pool=trace,zenoh=info \
+        lldb-server g 0.0.0.0:12345 -- \
+        ./target/${BUILD_PROFILE}/ourodaemon -i ourodaemon -c "${config}" \
+        >> /tmp/ourodaemon.log 2>&1 &
+else
+    # Normal start
+    cd "${dir}" && ./target/${BUILD_PROFILE}/ourodaemon -i ourodaemon -c "${config}" \
+        >> /tmp/ourodaemon.log 2>&1 &
+fi
+
+# Wait a moment for process to start
+sleep 1
+
+# Verify process is running
+if ps auxgw | grep '[o]urodaemon -i'; then
+    echo "Ouro Daemon is running."
+else
+    echo "Ouro Daemon is not running."
+fi
+
+tail -f /tmp/ourodaemon.log
+""",
+    ]
+
+[tasks.odown]
+    description = "Stop ourodaemon (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+echo "[odown]"
+pkill ourodaemon || true
+""" ]
+
+[tasks.oupr]
+    description = "Start ourodaemon for remote)"
+    dependencies = [ "odownr" ]
+    script = [ """ REMOTE="ourocloud" cargo make oup """ ]
+
+[tasks.odownr]
+    description = "Stop ourodaemon for remote)"
+    script = [ """ REMOTE="ourocloud" cargo make odown """ ]
+
+[tasks.olog]
+    description = "Tail ourodaemon log (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+tail -f /tmp/ourodaemon.log
+""" ]
+
+[tasks.ologr]
+    description = "Tail ourodaemon log for remote"
+    script = [ """ REMOTE="ourocloud" cargo make olog """ ]
+
+[tasks.aup]
+    description = "Start all services"
+    dependencies = [ "cup", "zup", "oup", "stat" ]
+
+[tasks.adown]
+    description = "Stop all remote services"
+    dependencies = [ # don't need rdown since ray will be used only on the cluster nodes, not on the local machine
+        "cdown",
+        "zdown",
+        "odown",
+        "stat",
+    ]
+
+[tasks.aupr]
+    description = "Start all services for remote)"
+    dependencies = [ "cupr", "rup", "zupr", "oupr", "stat" ]
+
+[tasks.adownr]
+    description = "Stop all remote services"
+    dependencies = [ "cdownr", "rdown", "zdownr", "odownr", "statr" ]
+
+[tasks.rstat]
+    description = "Show Ray status (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+echo "********[[ RAY ]]********"
+ray status 2>/dev/null || echo 'Ray is not running.'
+""" ]
+
+[tasks.rstatr]
+    description = "Show Ray status (use REMOTE=<host> for remote)"
+    script = [ """ REMOTE="ouroworld" cargo make rstat """ ]
+
+[tasks.cstat]
+    description = "Show Container status (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+echo "********[[ CONTAINER ]]********"
+docker ps 2>/dev/null || echo 'Docker is not available.'
+""" ]
+
+[tasks.zstat]
+    description = "Show Zenoh status (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+echo "********[[ ZENOH ]]********"
+if ps auxgw | grep '[z]enohd --config'; then
+    echo "Zenoh Daemon is running."
+else
+    echo "Zenoh Daemon is not running."
+fi
+""" ]
+
+[tasks.ostat]
+    description = "Show Ouroboros status (use REMOTE=<host> for remote)"
+    script = [ """
+#!/usr/bin/env bash
+. bin/remote-helper.sh
+remote_guard && exit 0
+
+echo "********[[ OUROBOROS ]]********"
+if ps auxgw | grep '[o]urodaemon -i'; then
+    echo "Ouro Daemon is running."
+else
+    echo "Ouro Daemon is not running."
+fi
+""" ]
+
+[tasks.stat]
+    description = "Show system status for remote"
+    dependencies = [ "rstat", "cstat", "zstat", "ostat" ]
+
+[tasks.statr]
+    description = "Show system status for remote"
+    script = [ """
+    REMOTE="ouroworld" cargo make rstat
+    REMOTE="ourocloud" cargo make cstat
+    REMOTE="ourocloud" cargo make zstat
+    REMOTE="ourocloud" cargo make ostat
+    """ ]
+
+[tasks.pdoc]
+    description = "Generate Python documentation from docstrings"
+    script = [
+        """
+#!/usr/bin/env bash
+
+# Get the directory where Makefile.toml is located
+PROJECT_DIR="${CARGO_MAKE_WORKING_DIRECTORY}"
+PYTHON_DIR="$PROJECT_DIR/python"
+
+# Activate virtual environment
+. "$PROJECT_DIR/.venv/bin/activate"
+
+# Generate documentation using pdoc
+if [ -d "$PYTHON_DIR" ]; then
+    echo "Generating documentation from $PYTHON_DIR"
+    rm -rf "$PROJECT_DIR/docs/python"
+    PYTHONPATH="$PYTHON_DIR" \
+        pdoc \
+        -o "$PROJECT_DIR/docs/python" \
+        -d google \
+        --favicon "https://toyotainfotech.github.io/ouroboros/image/Ouroboros.png" \
+        --footer-text "Ouroboros Documentation" \
+        --logo "https://toyotainfotech.github.io/ouroboros/image/Ouroboros.png" \
+        --search \
+        --show-source \
+        "$PYTHON_DIR"
+    echo "Documentation generated in $PROJECT_DIR/doc/python"
+else
+    echo "Error: Python directory not found at $PYTHON_DIR"
+    exit 1
+fi
+""",
+    ]
+
+[tasks.rdoc]
+    description = "Generate Rust documentation from src directory"
+    script = [ """
+#!/usr/bin/env bash
+
+# Get the directory where Makefile.toml is located
+PROJECT_DIR="${CARGO_MAKE_WORKING_DIRECTORY}"
+RUST_DOC_DIR="$PROJECT_DIR/docs/rust"
+
+echo "Generating Rust documentation from src/"
+
+# Generate documentation with cargo doc
+cargo doc --no-deps --document-private-items
+
+# Remove old documentation
+rm -rf "$RUST_DOC_DIR"
+
+# Copy generated documentation to docs/rust
+if [ -d "$PROJECT_DIR/target/doc" ]; then
+    cp -r "$PROJECT_DIR/target/doc" "$RUST_DOC_DIR"
+    echo "Rust documentation generated in $RUST_DOC_DIR"
+    echo "Open $RUST_DOC_DIR/ouroboros/index.html to view"
+else
+    echo "Error: Documentation was not generated in target/doc"
+    exit 1
+fi
+""" ]
+
+[tasks.bweb]
+    description = "Build web UI"
+    script = [ '''
+#!/usr/bin/env bash
+[ -z "${OURO_HOME}" ] && { echo "Error: OURO_HOME is not set" >&2; exit 1; }
+dir="${OURO_HOME}/webui"
+echo "[build-webui] dir=${dir}"
+cd "${dir}" && npm install && npm run build
+''' ]
+
+[tasks.sync]
+    description = "Sync files to remote hosts (use: cargo make fsync, or REMOTE=host cargo make fsync, or SYNC_ROLE=cloud cargo make fsync)"
+    script = [ ''' ./bin/ouro-sync --role all ''' ]

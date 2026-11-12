@@ -1,0 +1,9 @@
+{
+  // Solution-style config: the app sources and the Vite config are
+  // type-checked as separate projects.
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}

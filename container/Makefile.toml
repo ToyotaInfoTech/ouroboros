@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+[tasks.cup]
+    description = "Startup containers"
+    workspace = false
+    script = [ '''
+#!/usr/bin/env bash
+if [[ "$(uname)" == "Darwin" ]]; then
+    DC=(docker-compose)
+else
+    DC=(docker compose)
+fi
+mkdir -p ./data/timescaledb ./data/grafana
+sudo chown -R 472:472 ./data/grafana
+sudo chmod -R u+rwX ./data/grafana
+"${DC[@]}" up -d
+''' ]
+
+[tasks.cdown]
+    description = "Shutdown containers"
+    workspace = false
+    script = [ '''
+#!/usr/bin/env bash
+if [[ "$(uname)" == "Darwin" ]]; then
+    DC=(docker-compose)
+else
+    DC=(docker compose)
+fi
+"${DC[@]}" down
+''' ]
+
+[tasks.cshow]
+    description = "Show containers"
+    workspace = false
+    script = [ "docker ps -a" ]
+
+[tasks.dshow]
+    description = "Checks timescaledb"
+    workspace = false
+    script = [
+        '''
+: "${PGPASSWORD:?Set PGPASSWORD to the database password}"
+export PGPASSWORD
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "\dt"
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "SELECT * FROM telemetry LIMIT 5;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "SELECT * FROM system_state LIMIT 5;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "SELECT * FROM state_tags LIMIT 5;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "SELECT * FROM device_shadows LIMIT 5;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "SELECT * FROM edge_tag_assignments LIMIT 5;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "SELECT * FROM camera_image LIMIT 5;" || true
+''',
+    ]
+
+[tasks.dclear]
+    description = "Clear tables"
+    workspace = false
+    script = [
+        '''
+: "${PGPASSWORD:?Set PGPASSWORD to the database password}"
+export PGPASSWORD
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DELETE FROM telemetry;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DELETE FROM system_state;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DELETE FROM state_tags;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DELETE FROM device_shadows;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DELETE FROM edge_tag_assignments;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DELETE FROM camera_image;" || true
+''',
+    ]
+
+[tasks.ddrop]
+    description = "Drop tables"
+    workspace = false
+    script = [
+        '''
+: "${PGPASSWORD:?Set PGPASSWORD to the database password}"
+export PGPASSWORD
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DROP TABLE telemetry;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DROP TABLE system_state;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DROP TABLE edge_tag_assignments;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DROP TABLE state_tags;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DROP TABLE device_shadows;" || true
+psql -h localhost -U ${PGUSER:-ouro} -d ${PGDATABASE:-ouroboros} -c "DROP TABLE camera_image;" || true
+''',
+    ]
+
+[tasks.crm]
+    description = "Remove containers"
+    workspace = false
+    script = [ '''
+#!/usr/bin/env bash
+sudo rm -rf ./data
+''' ]
+    dependencies = [ "cdown" ]

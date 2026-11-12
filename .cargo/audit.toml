@@ -1,0 +1,7 @@
+[advisories]
+    # Keep in sync with [advisories] ignore in deny.toml.
+    ignore = [
+        "RUSTSEC-2026-0041", # lz4_flex via zenoh-transport; no fix in zenoh 1.9
+        "RUSTSEC-2026-0459", # libsqlite3-sys via sqlx-sqlite; waiting for an sqlx release with SQLite 3.54+
+        "RUSTSEC-2023-0071", # rsa via sqlx-mysql; no fix available upstream
+    ]

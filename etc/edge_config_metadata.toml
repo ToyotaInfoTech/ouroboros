@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: Copyright 2026 TOYOTA MOTOR CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+[metadata]
+    schema_version = 1
+    [[metadata.epoch]]
+
+
+[[task]]
+    display_name = "metadata"
+    name = "periodic_metadata_upload"
+    type = "data_upload"
+    enabled = true
+    [task.with_client]
+        type = "ref"
+        ref = "zenoh-session"
+    [task.data]
+        type = "trajectory"
+        [task.data.with_data_source]
+            [task.data.with_data_source.ref]
+                type = "sql_db"
+                ref = "sqlite_memory"
+                init_sql = [ """
+                    CREATE TABLE IF NOT EXISTS metadata (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        start_time TIMESTAMP NOT NULL,
+                        end_time TIMESTAMP NOT NULL,
+                        cbor BLOB NOT NULL,
+                        acked BOOLEAN NOT NULL DEFAULT 0
+                    );""" ]
+        [task.data.with_camera_data_source]
+            [task.data.with_camera_data_source.ref]
+                type = "sql_db"
+                ref = "sqlite_camera"
+    [task.behavior]
+        max_continuous_errors = 3
+        [[task.behavior.trigger]]
+            type = "periodic"
+            enabled = true
+            interval_secs = 20
