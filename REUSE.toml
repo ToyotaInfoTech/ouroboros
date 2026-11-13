@@ -55,3 +55,9 @@ path = [
 ]
 SPDX-FileCopyrightText = "Copyright 2026 TOYOTA MOTOR CORPORATION"
 SPDX-License-Identifier = "Apache-2.0"
+
+# Adapted third-party material.
+[[annotations]]
+path = ["CODE_OF_CONDUCT.md"]
+SPDX-FileCopyrightText = "Contributor Covenant contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"

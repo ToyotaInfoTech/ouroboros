@@ -8,8 +8,14 @@ Third-party dependencies (Cargo crates, Python packages and npm packages) are
 not included in this repository. Their exact versions are pinned in Cargo.lock,
 uv.lock and webui/package-lock.json, and their licenses are checked in CI.
 
-This repository does not include third-party source files or assets. If third-party
-material is added, record its copyright notice and license here and in REUSE.toml.
+Third-party material included in this repository is listed below. Record its
+copyright notice and license here and in REUSE.toml.
+
+1. Contributor Covenant, version 3.0
+
+   CODE_OF_CONDUCT.md is adapted from the Contributor Covenant, stewarded by the
+   Organization for Ethical Source and licensed under CC BY-SA 4.0.
+   License text: LICENSES/CC-BY-SA-4.0.txt.
 
 The following third-party dependencies are not included in this repository, but
 they are licensed under weak copyleft licenses instead of a permissive one. They
