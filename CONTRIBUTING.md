@@ -4,6 +4,8 @@
 > This is not production-ready software. Expect breaking changes and incomplete features.
 > Contributions of all kinds — code, documentation, ideas, and bug reports — are welcome.
 
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) when participating in this project.
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
