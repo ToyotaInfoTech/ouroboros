@@ -46,13 +46,13 @@ We agree to restrict the following behaviors in our community. Instances, threat
 
 Tensions can occur between community members even when they are trying their best to collaborate. Not every conflict represents a code of conduct violation, and this Code of Conduct reinforces encouraged behaviors and norms that can help avoid conflicts and minimize harm.
 
-When an incident does occur, it is important to report it promptly. To report a possible violation, **If you experience or witness behavior that may violate this Code of Conduct, please report it privately to the Ouroboros project maintainers at ryo.neyama.2 <at> toyota <dot> global. Please do not include sensitive details in public GitHub issues, discussions, or pull requests.
+When an incident does occur, it is important to report it promptly. If you experience or witness behavior that may violate this Code of Conduct, please report it privately to the Ouroboros project maintainers at `ryo.neyama.2 <at> toyota <dot> global`. Please do not include sensitive details in public GitHub issues, discussions, or pull requests.
 
 Share as much information as you feel comfortable providing, such as what happened, when and where it occurred, and any relevant links or screenshots. You do not need to provide a complete account to raise a concern. Reports may be submitted in English or Japanese.
 
 All reports will be reviewed promptly and fairly. Information will be shared only with those who need it to assess and respond to the report, or as required by law. Anyone with a conflict of interest will not participate in handling the report.
 
-Retaliation against anyone who raises a concern or participates in a review in good faith is not tolerated.**
+Retaliation against anyone who raises a concern or participates in a review in good faith is not tolerated.
 
 Community Moderators take reports of violations seriously and will make every effort to respond in a timely manner. They will investigate all reports of code of conduct violations, reviewing messages, logs, and recordings, or interviewing witnesses and other participants. Community Moderators will keep investigation and enforcement actions as transparent as possible while prioritizing safety and confidentiality. In order to honor these values, enforcement actions are carried out in private with the involved parties, but communicating to the whole community may be part of a mutually agreed upon resolution.
 
